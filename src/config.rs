@@ -1,6 +1,14 @@
-/*
+use libc::c_uint;
+use x11::xlib;
+
+
 
 /*  stuff you can change */
+
+// mod key (Mod1Mask = alt, Mod4Mask = super) 
+pub const MOD_KEY: c_uint = xlib::Mod1Mask;
+
+/*
 
 // character used to seperate workspace names
 pub const WORKSPACE_DELIMITER: char = ' ';
