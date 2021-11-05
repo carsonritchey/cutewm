@@ -1,7 +1,7 @@
 use x11::xlib;
 use x11::xlib::*;
 use std::mem::zeroed; 
-use libc::{c_int, c_uint};
+use libc::c_int;
 
 mod config;
 
@@ -13,24 +13,12 @@ fn main() {
         std::process::exit(1);
     }
 
-    // information about a given window
     let mut attr: xlib::XWindowAttributes = unsafe { zeroed() };
-
-    // keys pressed in a given instance 
     let mut start: xlib::XButtonEvent = unsafe { zeroed() }; 
-
     let mut event: xlib::XEvent = unsafe { zeroed() };
-
     start.subwindow = 0;
 
-    // tells xevent to listen for these key presses
-    unsafe {
-        // mod + left click 
-        xlib::XGrabButton(display, 1, config::MOD_KEY, xlib::XDefaultRootWindow(display), true as c_int, (xlib::ButtonPressMask|xlib::ButtonReleaseMask|xlib::PointerMotionMask) as c_uint, xlib::GrabModeAsync, xlib::GrabModeAsync, 0, 0);
-
-        // mod + right click
-        xlib::XGrabButton(display, 3, config::MOD_KEY, xlib::XDefaultRootWindow(display), true as c_int, (xlib::ButtonPressMask|xlib::ButtonReleaseMask|xlib::PointerMotionMask) as c_uint, xlib::GrabModeAsync, xlib::GrabModeAsync, 0, 0);
-    }
+    config::init_hotkeys(display);
 
     loop {
         unsafe {
@@ -49,7 +37,6 @@ fn main() {
                     if start.subwindow != 0 {
                         let xbutton: xlib::XButtonEvent = From::from(event);
 
-                        // difference between where mouse started and where it is 
                         let dx: c_int = xbutton.x_root - start.x_root;
                         let dy: c_int = xbutton.y_root - start.y_root;
 
