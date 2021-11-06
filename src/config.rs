@@ -1,13 +1,21 @@
 use libc::{c_int, c_uint};
 use x11::xlib;
 use x11::xlib::*;
+use std::ffi::CString;
 
 pub fn init_hotkeys(display: *mut Display) {
     unsafe {
+        // window focus change
+        xlib::XGrabButton(display, 0, MOD_KEY, xlib::XDefaultRootWindow(display), true as c_int, xlib::FocusChangeMask as c_uint, xlib::GrabModeAsync, xlib::GrabModeAsync, 0, 0);
         // mod + left click 
         xlib::XGrabButton(display, 1, MOD_KEY, xlib::XDefaultRootWindow(display), true as c_int, (xlib::ButtonPressMask|xlib::ButtonReleaseMask|xlib::PointerMotionMask) as c_uint, xlib::GrabModeAsync, xlib::GrabModeAsync, 0, 0);
         // mod + right click
         xlib::XGrabButton(display, 3, MOD_KEY, xlib::XDefaultRootWindow(display), true as c_int, (xlib::ButtonPressMask|xlib::ButtonReleaseMask|xlib::PointerMotionMask) as c_uint, xlib::GrabModeAsync, xlib::GrabModeAsync, 0, 0);
+
+        // mod + C
+        let c = CString::new("c").unwrap();
+        xlib::XGrabKey(display, xlib::XKeysymToKeycode(display, xlib::XStringToKeysym(c.as_ptr())) as c_int, xlib::Mod1Mask, xlib::XDefaultRootWindow(display), true as c_int, xlib::GrabModeAsync, xlib::GrabModeAsync);
+
     }
 }
 
@@ -21,7 +29,7 @@ pub const MOD_KEY: c_uint = xlib::Mod1Mask;
 // character used to seperate workspace names
 pub const WORKSPACE_DELIMITER: char = ' ';
 
-// workspace names
+// workspace names (can be multiple characters long, and of differing length)
 pub const WORKSPACE_NAMES: &str = "1 2 3 4 5 6"; 
 
 // whether or not to draw gaps when only one window is on screen
@@ -33,11 +41,16 @@ pub const GAPS: usize = 1;
 // whether or not cutewm will draw its custom bar
 pub const DRAW_BAR: bool = true;
 
+*/
+
+// space between edge of screen and bar, in pixels (0 for no gaps)
+pub const BAR_VERT_GAP: i32 = 10;
+pub const BAR_HORI_GAP: i32 = 10;
+
+
 /* stuff you probably shouldn't change */
 
-pub const MIN_WINDOW_WIDTH: usize  = 10;
-pub const WIN_WINDOW_HEIGHT: usize = MIN_WINDOW_WIDTH;
+pub const MIN_WINDOW_WIDTH: i32  = 32;
+pub const MIN_WINDOW_HEIGHT: i32 = MIN_WINDOW_WIDTH;
 
 pub const SNAP_THRESHHOLD: usize = 15; 
-
-*/
