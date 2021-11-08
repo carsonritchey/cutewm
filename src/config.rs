@@ -41,16 +41,15 @@ pub const GAPS: usize = 1;
 // whether or not cutewm will draw its custom bar
 pub const DRAW_BAR: bool = true;
 
-*/
-
 // space between edge of screen and bar, in pixels (0 for no gaps)
 pub const BAR_VERT_GAP: i32 = 10;
 pub const BAR_HORI_GAP: i32 = 10;
 
+*/
 
 /* stuff you probably shouldn't change */
 
 pub const MIN_WINDOW_WIDTH: i32  = 32;
 pub const MIN_WINDOW_HEIGHT: i32 = MIN_WINDOW_WIDTH;
 
-pub const SNAP_THRESHHOLD: usize = 15; 
+pub const SNAP_THRESHHOLD: i32 = 30; 

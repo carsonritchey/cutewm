@@ -18,18 +18,18 @@ fn main() {
     let mut event: xlib::XEvent = unsafe { zeroed() };
     start.subwindow = 0;
 
-    config::init_hotkeys(display);
+    let mut display_width: i32 = 0;
+    let mut display_height: i32 = 0;
+    display_width = unsafe { xlib::XDisplayWidth(display, display_width) }; 
+    display_height = unsafe { xlib::XDisplayHeight(display, display_height) }; 
 
-    unsafe { 
-        xlib::XDefineCursor(display, xlib::XDefaultRootWindow(display), 0x0);
-        xlib::XCreateSimpleWindow(display, xlib::XDefaultRootWindow(display), config::BAR_HORI_GAP, config::BAR_VERT_GAP, 100, 100, 0, 0, 0);
-    }
+    config::init_hotkeys(display);
 
     loop {
         unsafe {
             xlib::XNextEvent(display, &mut event); 
 
-            println!("loop");
+            //println!("loop");
 
             match event.get_type() {
                 xlib::KeyPress => {
@@ -55,7 +55,24 @@ fn main() {
                         let dy: c_int = xbutton.y_root - start.y_root;
 
                         if start.button == 1 {
-                            xlib::XMoveWindow(display, start.subwindow, attr.x + dx, attr.y + dy);
+
+
+                            let mut new_x = attr.x + dx;
+                            if new_x < config::SNAP_THRESHHOLD && new_x > -config::SNAP_THRESHHOLD {
+                                new_x = 0;
+                            }
+                            else if new_x + attr.width > display_width - config::SNAP_THRESHHOLD && new_x + attr.width < display_width + config::SNAP_THRESHHOLD {
+                                new_x = display_width - attr.width;
+                            }
+                            let mut new_y = attr.y + dy;
+                            if new_y < config::SNAP_THRESHHOLD && new_y > -config::SNAP_THRESHHOLD {
+                                new_y = 0;
+                            }
+                            else if new_y + attr.height > display_height - config::SNAP_THRESHHOLD && new_y + attr.height < display_height + config::SNAP_THRESHHOLD {
+                                new_y = display_height - attr.height;
+                            }
+                            xlib::XMoveWindow(display, start.subwindow, new_x, new_y);
+
                         } else if start.button == 3 {
                             let mut new_x = attr.width + dx;
                             if new_x < config::MIN_WINDOW_WIDTH {
