@@ -25,11 +25,13 @@ fn main() {
 
     config::init_hotkeys(display);
 
+    let mut l: usize = 0;
     loop {
         unsafe {
-            xlib::XNextEvent(display, &mut event); 
+            xlib::XNextEvent(display, &mut event);
 
-            println!("loop");
+            println!("{}", l);
+            l += 1;
 
             match event.get_type() {
                 xlib::KeyPress => {

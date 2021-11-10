@@ -5,8 +5,6 @@ use std::ffi::CString;
 
 pub fn init_hotkeys(display: *mut Display) {
     unsafe {
-        // window focus change
-        xlib::XGrabButton(display, 0, MOD_KEY, xlib::XDefaultRootWindow(display), true as c_int, xlib::FocusChangeMask as c_uint, xlib::GrabModeAsync, xlib::GrabModeAsync, 0, 0);
         // mod + left click 
         xlib::XGrabButton(display, 1, MOD_KEY, xlib::XDefaultRootWindow(display), true as c_int, (xlib::ButtonPressMask|xlib::ButtonReleaseMask|xlib::PointerMotionMask) as c_uint, xlib::GrabModeAsync, xlib::GrabModeAsync, 0, 0);
         // mod + right click
