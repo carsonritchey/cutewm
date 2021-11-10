@@ -29,7 +29,7 @@ fn main() {
         unsafe {
             xlib::XNextEvent(display, &mut event); 
 
-            //println!("loop");
+            println!("loop");
 
             match event.get_type() {
                 xlib::KeyPress => {
@@ -55,8 +55,6 @@ fn main() {
                         let dy: c_int = xbutton.y_root - start.y_root;
 
                         if start.button == 1 {
-
-
                             let mut new_x = attr.x + dx;
                             if new_x < config::SNAP_THRESHHOLD && new_x > -config::SNAP_THRESHHOLD {
                                 new_x = 0;

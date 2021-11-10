@@ -41,6 +41,9 @@ pub const GAPS: usize = 1;
 // whether or not cutewm will draw its custom bar
 pub const DRAW_BAR: bool = true;
 
+// whether or not cutewm will draw the bar at the bottom of the screen or not (top)
+pub const BAR_ON_BOTTOM: bool = false; 
+
 // space between edge of screen and bar, in pixels (0 for no gaps)
 pub const BAR_VERT_GAP: i32 = 10;
 pub const BAR_HORI_GAP: i32 = 10;
