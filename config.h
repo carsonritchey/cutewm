@@ -20,6 +20,9 @@ static const int bar_hori_gap = 10;
 static const int frame_width = 5;
 
 /* stuff you probably shouldn't change */
+#define XC_left_ptr 68
+#define XC_sizing 120
+
 static const int min_window_width = 32;
 static const int min_window_height = min_window_width;
 

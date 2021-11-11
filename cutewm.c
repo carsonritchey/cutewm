@@ -11,6 +11,7 @@ Display* init();
 void init_events(Display* display); 
 void on_configure_request(Display* display, const XConfigureRequestEvent e);
 void on_map_request(Display* display, const XMapRequestEvent e);
+void set_cursor(Display* display, int font_index); 
 
 bool running = true;
 
@@ -18,13 +19,9 @@ int main() {
 	Display* display = init();
 
 	init_events(display); 
+	set_cursor(display, XC_left_ptr); 
 
-	XSync(display, false);
-
-	int s = DefaultScreen(display), sw = 800; 
-	Window bar = XCreateSimpleWindow(display, XDefaultRootWindow(display), 0, 0, sw, 16, 1, BlackPixel(display, s), WhitePixel(display, s));
-	XMapWindow(display, bar); 
-
+	//XSync(display, false);
 	while(running) {
 		handle_events(display);
 	}
@@ -47,6 +44,7 @@ Display* init() {
 
 	return display;
 }
+
 
 // tells X what events to listen for 
 void init_events(Display* display) {
@@ -122,8 +120,8 @@ void on_configure_request(Display* display, const XConfigureRequestEvent e) {
 
 	new.x = e.x;
 	new.y = e.y;
-	new.width = 100;
-	new.height = 100;
+	new.width = e.width;
+	new.height = e.height;
 	new.border_width = e.border_width;
 	new.sibling = e.above;
 	new.stack_mode = e.detail;
@@ -134,4 +132,8 @@ void on_configure_request(Display* display, const XConfigureRequestEvent e) {
 // X asks for cutewm to draw a window to the screen
 void on_map_request(Display* display, const XMapRequestEvent e) {
 	XMapWindow(display, e.window); 
+}
+
+void set_cursor(Display* display, int font_index) {
+	XDefineCursor(display, DefaultRootWindow(display), XCreateFontCursor(display, font_index)); 
 }
