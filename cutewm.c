@@ -10,6 +10,7 @@ void handle_events(Display* display);
 Display* init();
 void init_events(Display* display); 
 void on_configure_request(Display* display, const XConfigureRequestEvent e);
+void on_key_press(Display* display, const XKeyPressedEvent e);
 void on_map_request(Display* display, const XMapRequestEvent e);
 void set_cursor(Display* display, int font_index); 
 
@@ -19,7 +20,7 @@ int main() {
 	Display* display = init();
 
 	init_events(display); 
-	set_cursor(display, XC_left_ptr); 
+	set_cursor(display, ptr_std); 
 
 	//XSync(display, false);
 	while(running) {
@@ -102,10 +103,11 @@ void handle_events(Display* display) {
 			//printf("motionnotify event\n"); 
 			break;
 		case KeyPress:
-			printf("keypress event\n"); 
+			//printf("keypress event\n"); 
+			on_key_press(display, e.xkey); 
 			break;
 		case KeyRelease:
-			printf("keyrelease event\n"); 
+			//printf("keyrelease event\n"); 
 			break;
 
 		default:
@@ -129,11 +131,24 @@ void on_configure_request(Display* display, const XConfigureRequestEvent e) {
 	XConfigureWindow(display, e.window, e.value_mask, &new);
 }
 
+void on_key_press(Display* display, const XKeyPressedEvent e) {
+	printf("key code: {%d}\tkey state: {%d}\n", e.keycode, e.state);
+	printf("window: {%d}\n", e.subwindow);
+
+	// if button press on window (and not the background (root window)) 
+	if(e.subwindow != 0) {
+		if(e.keycode == 54) {
+			XDestroyWindow(display, e.subwindow); 
+		}
+	}
+}
+
 // X asks for cutewm to draw a window to the screen
 void on_map_request(Display* display, const XMapRequestEvent e) {
 	XMapWindow(display, e.window); 
 }
 
+// sets current cursor to whatever index specified (defined in config.h) 
 void set_cursor(Display* display, int font_index) {
 	XDefineCursor(display, DefaultRootWindow(display), XCreateFontCursor(display, font_index)); 
 }
