@@ -25,7 +25,8 @@ static const int frame_width = 5;
 		/* stuff you probably shouldn't change */
 
 #define ptr_std    68  // default cursor cutewm uses (set to 54 for 10x more fun) 
-#define ptr_sizing 120 // cursor used when resizing windows
+#define ptr_sizing 120
+#define ptr_moving 52
 
 static const int min_window_width = 32;
 static const int min_window_height = min_window_width;

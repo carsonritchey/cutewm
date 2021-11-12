@@ -137,6 +137,8 @@ void on_button_press(Display* display, const XButtonEvent e) {
 void on_button_release(Display* display, const XButtonEvent e) {
 	cx = -1;
 	cy = -1; 
+
+	set_cursor(display, ptr_std); 
 }
 
 // X asks for cutewm to place and size a window
@@ -180,7 +182,10 @@ void on_motion_notify(Display* display, const XButtonEvent e) {
 
 		if(e.state == (Button1Mask|mod_key)) {
 			XMoveWindow(display, e.subwindow, cw_attr.x + dx, cw_attr.y + dy); 
+			set_cursor(display, ptr_moving); 
 		} else if(e.state == (Button3Mask|mod_key)) {
+			set_cursor(display, ptr_sizing); 
+
 			XResizeWindow(display, e.subwindow, cw_attr.width + dx, cw_attr.height + dy); 
 		}
 
