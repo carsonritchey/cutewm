@@ -137,7 +137,7 @@ void on_key_press(Display* display, const XKeyPressedEvent e) {
 
 	// if button press on window (and not the background (root window)) 
 	if(e.subwindow != 0) {
-		if(e.keycode == 54) {
+		if(e.keycode == XKeysymToKeycode(display, 'c')) {
 			XDestroyWindow(display, e.subwindow); 
 		}
 	}
