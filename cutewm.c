@@ -133,11 +133,10 @@ void on_configure_request(Display* display, const XConfigureRequestEvent e) {
 
 void on_key_press(Display* display, const XKeyPressedEvent e) {
 	printf("key code: {%d}\tkey state: {%d}\n", e.keycode, e.state);
-	printf("window: {%d}\n", e.subwindow);
 
 	// if button press on window (and not the background (root window)) 
 	if(e.subwindow != 0) {
-		if(e.keycode == XKeysymToKeycode(display, 'c')) {
+		if(e.state == (mod_key|ShiftMask) && e.keycode == XKeysymToKeycode(display, 'c')) {
 			XDestroyWindow(display, e.subwindow); 
 		}
 	}

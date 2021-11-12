@@ -1,7 +1,7 @@
 		/* stuff you can change */
 
 // mod key (Mod1Mask = alt, Mod4Mask = super)
-#define MODKEY Mod1Mask
+#define mod_key Mod1Mask
 
 // whether or not to draw gaps when only one window is on screen
 static const int gaps_on_single = 0;
