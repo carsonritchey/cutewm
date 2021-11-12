@@ -21,6 +21,8 @@ bool running = true;
 unsigned int sw = 0, sh = 0; // screen width and height 
 int cx = -1, cy = -1;        // cursor x and y
 Window* cw;                  // "cursor window", "current window" (what's being dragged or resized)
+XWindowAttributes cw_attr;   // 
+
 
 int main() {
 	Display* display = init();
@@ -127,6 +129,9 @@ void handle_events(Display* display) {
 void on_button_press(Display* display, const XButtonEvent e) {
 	cx = e.x_root;
 	cy = e.y_root;
+
+	if(e.subwindow != 0) 
+		XGetWindowAttributes(display, e.subwindow, &cw_attr);
 }
 
 void on_button_release(Display* display, const XButtonEvent e) {
@@ -171,14 +176,12 @@ void on_map_request(Display* display, const XMapRequestEvent e) {
 
 void on_motion_notify(Display* display, const XButtonEvent e) {
 	if(e.subwindow != 0) {
-		if(e.state == Button1Mask) {
-			int dx = e.x_root - cx, dy = e.y_root - cy;
+		int dx = e.x_root - cx, dy = e.y_root - cy;
 
-			XWindowAttributes attr;
-			XGetWindowAttributes(display, e.subwindow, &attr);
-			XMoveWindow(display, e.subwindow, attr.x + dx, attr.y + dy); 
-		} else if(e.state == Button3Mask) {
-
+		if(e.state == (Button1Mask|mod_key)) {
+			XMoveWindow(display, e.subwindow, cw_attr.x + dx, cw_attr.y + dy); 
+		} else if(e.state == (Button3Mask|mod_key)) {
+			XResizeWindow(display, e.subwindow, cw_attr.width + dx, cw_attr.height + dy); 
 		}
 
 		// focus follows mouse 
