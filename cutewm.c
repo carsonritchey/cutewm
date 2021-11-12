@@ -9,12 +9,16 @@ void close(Display* display);
 void handle_events(Display* display);
 Display* init();
 void init_events(Display* display); 
+void on_button_press(Display* display, const XButtonEvent);
+void on_button_release(Display* display, const XButtonEvent e);
 void on_configure_request(Display* display, const XConfigureRequestEvent e);
 void on_key_press(Display* display, const XKeyPressedEvent e);
 void on_map_request(Display* display, const XMapRequestEvent e);
 void set_cursor(Display* display, int font_index); 
 
 bool running = true;
+unsigned int sw = 0, sh = 0; // screen width and height 
+int cx = -1, cy = -1;        // cursor x and y
 
 int main() {
 	Display* display = init();
@@ -38,10 +42,16 @@ void close(Display* display) {
 Display* init() {
 	Display* display;
 
+	printf("display init\n");
+
 	if(!(display = XOpenDisplay(0x0))) {
 		printf("unable to open X display (looking at 0x0)\nexiting...\n");
 		exit(0); 
 	}
+
+	Screen* screen = ScreenOfDisplay(display, 0);
+	sw = screen->width;
+	sh = screen->height;
 
 	return display;
 }
@@ -94,26 +104,32 @@ void handle_events(Display* display) {
 			on_configure_request(display, e.xconfigurerequest); 
 			break;
         case ButtonPress:
-			printf("buttonpress event\n"); 
+			on_button_press(display, e.xbutton); 
 			break;
         case ButtonRelease:
-			printf("buttonrelease event\n"); 
+			on_button_release(display, e.xbutton); 
 			break;
         case MotionNotify:
-			//printf("motionnotify event\n"); 
 			break;
 		case KeyPress:
-			//printf("keypress event\n"); 
 			on_key_press(display, e.xkey); 
 			break;
 		case KeyRelease:
-			//printf("keyrelease event\n"); 
 			break;
 
 		default:
-			//printf("unhandled case; ignoring\n");
 			break;
 	}
+}
+
+void on_button_press(Display* display, const XButtonEvent e) {
+	cx = e.x;
+	cy = e.y;
+}
+
+void on_button_release(Display* display, const XButtonEvent e) {
+	cx = -1;
+	cy = -1; 
 }
 
 // X asks for cutewm to place and size a window
@@ -144,7 +160,12 @@ void on_key_press(Display* display, const XKeyPressedEvent e) {
 
 // X asks for cutewm to draw a window to the screen
 void on_map_request(Display* display, const XMapRequestEvent e) {
+	if(e.window != DefaultRootWindow(display)) {
+		XMoveWindow(display, e.window, 100, 100); 
+	}
+
 	XMapWindow(display, e.window); 
+
 }
 
 // sets current cursor to whatever index specified (defined in config.h) 
