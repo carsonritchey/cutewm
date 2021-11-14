@@ -157,11 +157,18 @@ void on_configure_request(Display* display, const XConfigureRequestEvent e) {
 }
 
 void on_key_press(Display* display, const XKeyPressedEvent e) {
-	//printf("key code: {%d}\tkey state: {%d}\n", e.keycode, e.state);
+	//printf("key code: %d\tkey state: %d\twindow: %d\n", e.keycode, e.state, e.subwindow);
 
 	// if button press on window (and not the background (root window)) 
 	if(e.subwindow != 0) {
-		if(e.state == (mod_key|ShiftMask) && e.keycode == XKeysymToKeycode(display, 'c')) {
+		// closing cutewm
+		if(e.state == wm_kill_mask && e.keycode == XKeysymToKeycode(display, wm_kill_key)) {
+			close(display); 
+			return;
+		}
+
+		// closing window
+		else if(e.state == window_kill_mask && e.keycode == XKeysymToKeycode(display, window_kill_key)) {
 			XDestroyWindow(display, e.subwindow); 
 		}
 	}

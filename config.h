@@ -32,3 +32,11 @@ static const int min_window_width = 32;
 static const int min_window_height = min_window_width;
 
 static const int snap_threshold = 32; 
+
+		/* hotkeys */
+
+static const char          wm_kill_key  = 'q'; 
+static const unsigned long wm_kill_mask = mod_key|ShiftMask;
+
+static const char          window_kill_key  = 'c'; 
+static const unsigned long window_kill_mask = mod_key|ShiftMask;
