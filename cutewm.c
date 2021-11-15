@@ -45,8 +45,6 @@ void close(Display* display) {
 Display* init() {
 	Display* display;
 
-	printf("display init\n");
-
 	if(!(display = XOpenDisplay(0x0))) {
 		printf("unable to open X display (looking at 0x0)\nexiting...\n");
 		exit(0); 
@@ -173,6 +171,7 @@ void on_motion_notify(Display* display, const XButtonEvent e) {
 		if(e.state == (Button1Mask|mod_key)) {
 			int newx = cw_attr.x + dx, newy = cw_attr.y + dy;
 
+			// snap
 			if(newx < snap_threshold && newx > -snap_threshold) newx = 0;
 			else if(newx + cw_attr.width > sw - snap_threshold && newx + cw_attr.width < sw + snap_threshold) newx = sw - cw_attr.width;
 			if(newy < snap_threshold && newy > -snap_threshold) newy = 0;
@@ -183,9 +182,14 @@ void on_motion_notify(Display* display, const XButtonEvent e) {
 		}
 		// resizing window
 		else if(e.state == (Button3Mask|mod_key)) {
-			set_cursor(display, ptr_sizing); 
+			int newx = cw_attr.width + dx, newy = cw_attr.height + dy; 
 
-			XResizeWindow(display, e.subwindow, cw_attr.width + dx, cw_attr.height + dy); 
+			// min w&h
+			if(newx < min_window_width)  newx = min_window_width;
+			if(newy < min_window_height) newy = min_window_height;
+
+			XResizeWindow(display, e.subwindow, newx, newy); 
+			set_cursor(display, ptr_sizing); 
 		}
 
 		// focus follows mouse 
