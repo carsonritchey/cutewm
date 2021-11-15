@@ -23,7 +23,6 @@ int cx = -1, cy = -1;        // cursor x and y
 Window* cw;                  // "cursor window", "current window" (what's being dragged or resized)
 XWindowAttributes cw_attr;   // 
 
-
 int main() {
 	Display* display = init();
 
@@ -81,23 +80,6 @@ void handle_events(Display* display) {
 	XNextEvent(display, &e);
 
 	switch(e.type) {
-		/*case CreateNotify: unneeded for now
-			printf("createnotify event\n"); 
-			break;
-		case DestroyNotify:
-			printf("destroynotify event\n"); 
-			break;
-        case ReparentNotify:
-			printf("reparentnotify event\n"); 
-			break;
-        case MapNotify:
-			printf("mapnotify event\n"); 
-			break;*/
-        case UnmapNotify:
-			printf("unmapnotify event\n"); 
- 			break;
-        case ConfigureNotify:
-			break;
         case MapRequest:
 			printf("maprequest event\n"); 
 			on_map_request(display, e.xmaprequest); 
@@ -187,10 +169,20 @@ void on_motion_notify(Display* display, const XButtonEvent e) {
 	if(e.subwindow != 0) {
 		int dx = e.x_root - cx, dy = e.y_root - cy;
 
+		// moving window
 		if(e.state == (Button1Mask|mod_key)) {
-			XMoveWindow(display, e.subwindow, cw_attr.x + dx, cw_attr.y + dy); 
+			int newx = cw_attr.x + dx, newy = cw_attr.y + dy;
+
+			if(newx < snap_threshold && newx > -snap_threshold) newx = 0;
+			else if(newx + cw_attr.width > sw - snap_threshold && newx + cw_attr.width < sw + snap_threshold) newx = sw - cw_attr.width;
+			if(newy < snap_threshold && newy > -snap_threshold) newy = 0;
+			else if(newy + cw_attr.height > sh - snap_threshold && newy + cw_attr.height < sh + snap_threshold) newy = sh - cw_attr.height;
+
+			XMoveWindow(display, e.subwindow, newx, newy); 
 			set_cursor(display, ptr_moving); 
-		} else if(e.state == (Button3Mask|mod_key)) {
+		}
+		// resizing window
+		else if(e.state == (Button3Mask|mod_key)) {
 			set_cursor(display, ptr_sizing); 
 
 			XResizeWindow(display, e.subwindow, cw_attr.width + dx, cw_attr.height + dy); 
