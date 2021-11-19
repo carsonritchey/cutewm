@@ -21,7 +21,7 @@ bool running = true;
 unsigned int sw = 0, sh = 0; // screen width and height 
 int cx = -1, cy = -1;        // cursor x and y
 Window* cw;                  // "cursor window", "current window" (what's being dragged or resized)
-XWindowAttributes cw_attr;   // 
+XWindowAttributes cw_attr; 
 
 int main() {
 	Display* display = init();
@@ -60,16 +60,16 @@ Display* init() {
 
 // tells X what events to listen for 
 void init_events(Display* display) {
-	unsigned long masks = 
-		SubstructureRedirectMask|
-		SubstructureNotifyMask|
-		ButtonPressMask|
-		ButtonReleaseMask|
-		PointerMotionMask|
-		KeyPressMask|
-		KeyReleaseMask;
+	// makes cutewm reparenting
+	XSelectInput(display, DefaultRootWindow(display), SubstructureRedirectMask|SubstructureNotifyMask);
 
-	XSelectInput(display, DefaultRootWindow(display), masks);
+	// makes X report all mouse events 
+	XGrabButton(display, AnyButton, AnyModifier, DefaultRootWindow(display), True, 
+			ButtonPressMask|ButtonReleaseMask|PointerMotionMask|OwnerGrabButtonMask,
+			GrabModeAsync, GrabModeAsync, None, None);
+
+	// makes X report all keyboard events 
+	XGrabKeyboard(display, DefaultRootWindow(display), True, GrabModeAsync, GrabModeAsync, None); 
 }
 
 // main event loop
@@ -87,6 +87,7 @@ void handle_events(Display* display) {
 			on_configure_request(display, e.xconfigurerequest); 
 			break;
         case ButtonPress:
+			printf("buttonpress event\n"); 
 			on_button_press(display, e.xbutton); 
 			break;
         case ButtonRelease:
@@ -96,6 +97,7 @@ void handle_events(Display* display) {
 			on_motion_notify(display, e.xbutton); 
 			break;
 		case KeyPress:
+			printf("keypress event\n"); 
 			on_key_press(display, e.xkey); 
 			break;
 		case KeyRelease:
