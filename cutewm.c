@@ -21,15 +21,16 @@ bool running = true;
 unsigned int sw = 0, sh = 0; // screen width and height 
 int cx = -1, cy = -1;        // cursor x and y
 Window* cw;                  // "cursor window", "current window" (what's being dragged or resized)
-XWindowAttributes cw_attr; 
+XWindowAttributes cw_attr;   // current window attributes 
+Window root;                 // default root window 
 
 int main() {
 	Display* display = init();
+	root = DefaultRootWindow(display); 
 
 	init_events(display); 
 	set_cursor(display, ptr_std); 
 
-	//XSync(display, false);
 	while(running) {
 		handle_events(display);
 	}
@@ -61,15 +62,15 @@ Display* init() {
 // tells X what events to listen for 
 void init_events(Display* display) {
 	// makes cutewm reparenting
-	XSelectInput(display, DefaultRootWindow(display), SubstructureRedirectMask|SubstructureNotifyMask);
+	XSelectInput(display, root, SubstructureRedirectMask|SubstructureNotifyMask|PointerMotionMask);
 
 	// makes X report all mouse events 
-	XGrabButton(display, AnyButton, AnyModifier, DefaultRootWindow(display), True, 
+	XGrabButton(display, AnyButton, AnyModifier, root, True, 
 			ButtonPressMask|ButtonReleaseMask|PointerMotionMask|OwnerGrabButtonMask,
 			GrabModeAsync, GrabModeAsync, None, None);
 
 	// makes X report all keyboard events 
-	XGrabKeyboard(display, DefaultRootWindow(display), True, GrabModeAsync, GrabModeAsync, None); 
+	XGrabKeyboard(display, root, True, GrabModeAsync, GrabModeAsync, None); 
 }
 
 // main event loop
@@ -158,7 +159,7 @@ void on_key_press(Display* display, const XKeyPressedEvent e) {
 
 // X asks for cutewm to draw a window to the screen
 void on_map_request(Display* display, const XMapRequestEvent e) {
-	if(e.window != DefaultRootWindow(display)) {
+	if(e.window != root) {
 		XMoveWindow(display, e.window, 100, 100); 
 	}
 
@@ -201,5 +202,5 @@ void on_motion_notify(Display* display, const XButtonEvent e) {
 
 // sets current cursor to whatever index specified (defined in config.h) 
 void set_cursor(Display* display, int font_index) {
-	XDefineCursor(display, DefaultRootWindow(display), XCreateFontCursor(display, font_index)); 
+	XDefineCursor(display, root, XCreateFontCursor(display, font_index)); 
 }
